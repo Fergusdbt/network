@@ -1,0 +1,88 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+
+    <div class="headers">
+        <h2>{{ user.username }}</h2>
+
+        <p>{{ user.followers.count }} Followers | {{ user.following.count }} Following</p>
+
+    {% if request.user != user %}
+
+        {% if is_following == False %}
+
+            <form action="{% url 'profile' user.username %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-primary" type="submit" name="button" value="Follow">
+            </form>
+
+        {% else %}
+
+            <form action="{% url 'profile' user.username %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-primary" type="submit" name="button" value="Unfollow">
+            </form>
+
+        {% endif %}
+
+    {% endif %}
+
+    </div>
+
+    {% for post in page_obj %}
+
+        <div class="container">
+            <h5>
+                <a href="{% url 'profile' post.user.username %}">{{ post.user.username }}</a>
+            </h5>
+            <p id="content {{ post.id }}">{{ post.content }}</p>
+            <div id="edit_fields {{ post.id }}" hidden="true">
+                <div id="edit_textarea {{ post.id }}">
+                </div>
+                <button class="btn btn-danger" id="cancel {{ post.id }}">Cancel</button>
+                <button class="btn btn-success" id="save {{ post.id }}" data-csrf="{{ csrf_token }}">Save</button>
+            </div>
+            <p id="timestamp">{{ post.timestamp }}</p>
+            <p id="like_count_{{ post.id }}">&#x2665;&#xfe0f; {{ post.likes.count }}</p>
+
+            {% if user.is_authenticated %}
+
+                <button class="btn btn-primary" id="like_{{ post.id }}" onclick="like('{{ post.id }}')">
+
+                {% if post in liked_posts %}
+                    Unlike
+                {% else %}
+                    Like
+                {% endif %}
+
+                </button>
+
+                {% if request.user == post.user %}
+
+                    <button class="btn btn-primary" id="edit_button {{ post.id }}" onclick="edit_post('{{ post.id }}')">Edit</button>
+
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+
+    {% endfor %}
+
+    <nav aria-label="Profile posts navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+
+            {% for page_obj in page_obj.paginator %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.number }}">{{ page_obj.number }}</a></li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+{% endblock %}

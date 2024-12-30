@@ -1,0 +1,20 @@
+.headers {
+    margin: 10px;
+}
+
+.container {
+    border: solid grey 1px;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px;
+}
+
+#timestamp {
+    color: grey;
+}
+
+.pagination {
+    margin: 10px;
+}
+
+
